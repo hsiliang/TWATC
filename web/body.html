@@ -1,0 +1,80 @@
+<div id="app">
+  <header class="rail">
+    <span class="brand"><b>臺灣防空識別區航情圖</b><span>Taiwan ADIZ Traffic</span></span>
+    <span class="search">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+        <circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5 L14.5 14.5"></path>
+      </svg>
+      <input id="q" type="text" placeholder="呼號 / 註冊 / 機型" autocomplete="off"
+             spellcheck="false" aria-label="搜尋航班 Search flights">
+    </span>
+    <span class="stat" id="s-feed"><i class="dot"></i>—</span>
+    <span class="stat" id="s-count"><b>0</b> 架</span>
+    <span class="sp"></span>
+    <button class="ib" id="b-theme" title="切換明暗 Toggle theme">◐</button>
+    <button class="ib" id="b-reset" title="重置視角 Reset view">⟲</button>
+    <button class="ib" id="b-set" aria-pressed="false">設定 Settings</button>
+  </header>
+
+  <div class="body">
+    <div id="scope"></div>
+
+    <section class="fp" id="fp" hidden></section>
+
+    <aside class="sheet" id="sheet" hidden>
+      <h3>實時來源 Live source</h3>
+      <p>ADS-B Exchange（RapidAPI）是少數會送 CORS 標頭的來源，靜態網頁可直接讀取。
+         在 RapidAPI 訂閱 <code>adsbexchange-com1</code> 後把金鑰貼在這裡，只存在你的瀏覽器。</p>
+      <input id="s-key" type="password" placeholder="RapidAPI Key" autocomplete="off">
+      <div class="row">
+        <button class="ib" id="b-key" style="flex:1">套用並連線</button>
+        <button class="ib" id="b-key-clear">清除</button>
+      </div>
+      <p style="margin-top:.5rem">或使用你自己的 CORS 端點（如 Cloudflare Worker），
+         佔位符 <code>{lat} {lon} {dist}</code>：</p>
+      <input id="s-feed-url" type="text" placeholder="https://…/v2/lat/{lat}/lon/{lon}/dist/{dist}">
+      <div class="row"><button class="ib" id="b-feed" style="flex:1">套用端點</button></div>
+      <label class="sw" style="margin-top:.5rem"><span>更新間隔</span>
+        <select id="s-int" style="width:auto">
+          <option value="10">10 秒</option><option value="15">15 秒</option>
+          <option value="30" selected>30 秒</option><option value="60">60 秒</option>
+        </select></label>
+      <p id="feed-note"></p>
+
+      <h3>圖層 Layers</h3>
+      <label class="sw"><span>航路 Airways</span><input type="checkbox" id="t-awy" checked></label>
+      <label class="sw"><span>航路點 Waypoints</span><input type="checkbox" id="t-wpt"></label>
+      <label class="sw"><span>機場 Airports</span><input type="checkbox" id="t-apt" checked></label>
+      <label class="sw"><span>防空識別區 ADIZ</span><input type="checkbox" id="t-adiz" checked></label>
+      <label class="sw"><span>飛航情報區 Taipei FIR</span><input type="checkbox" id="t-fir" checked></label>
+      <label class="sw"><span>航機標籤 Labels</span><input type="checkbox" id="t-lab" checked></label>
+      <label class="sw"><span>管制扇區 ATC sectors</span><input type="checkbox" id="t-sec"></label>
+      <label class="sw"><span>地面航機 On-ground traffic</span><input type="checkbox" id="t-gnd" checked></label>
+
+      <h3>底圖 Basemap</h3>
+      <div class="row">
+        <button class="chip" data-bm="vector" aria-pressed="true" style="flex:1">向量海岸線</button>
+        <button class="chip" data-bm="tiles" aria-pressed="false" style="flex:1">圖磚</button>
+        <button class="chip" data-bm="none" aria-pressed="false" style="flex:1">無</button>
+      </div>
+      <p>海岸線內建於頁面（Natural Earth 1:10m），不需連線即可顯示。「圖磚」需要向
+         CARTO 取圖，在受限的嵌入環境（例如以 Artifact 開啟本頁）可能被擋下。</p>
+
+      <h3>資料來源 Sources</h3>
+      <p>防空識別區 · 飛航情報區 · 航路點 · 機場：交通部民航局 AIP Taiwan
+         （ENR 5.2 / ENR 2.1 / ENR 4.4 / ENR 4.1 / AD 2.2）。
+         航路「點的順序」AIP 未公布，由最短路徑重建；<span id="awy-warn"></span>
+         M503、N884 等海峽西側航路不在台灣 AIP，未繪製。
+         管制扇區頻率來自 AIP CHINA ENR 2.1.3 / 2.2.1。</p>
+      <p style="color:var(--crit)">僅供研究與教學，不得用於實際飛行或空中交通服務。</p>
+    </aside>
+
+    <div class="bar">
+      <button class="chip" id="c-awy" aria-pressed="true"><i style="background:var(--awy)"></i>航路</button>
+      <button class="chip" id="c-apt" aria-pressed="true"><i style="background:var(--apt)"></i>機場</button>
+      <button class="chip" id="c-adiz" aria-pressed="true"><i style="background:var(--adiz)"></i>ADIZ</button>
+      <button class="chip" id="c-sec" aria-pressed="false"><i style="background:var(--fir)"></i>扇區</button>
+    </div>
+    <div class="attrib" id="attrib">© OpenStreetMap · © CARTO</div>
+  </div>
+</div>
